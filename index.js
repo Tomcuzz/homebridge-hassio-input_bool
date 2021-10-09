@@ -14,8 +14,8 @@ class HassInputBool{
 
 		this.name = config.name || 'hass-input-bool';
 		this.current_value = "";
-		this.on_value = config.on_value || "ON";
-		this.off_value = config.off_value || "OFF";
+		this.on_value = config.on_value || "on";
+		this.off_value = config.off_value || "off";
 
 		this.mqtt_url = config.mqtt.url || '';
 		this.mqtt_clientid = config.mqtt.clientid || this.createClientId();

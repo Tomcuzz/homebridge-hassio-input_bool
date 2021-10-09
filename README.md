@@ -16,19 +16,11 @@ An example configuration for HomeBridge is below:
 
 ```javascript
 {
-  "accessory": "HassInputSelect",
-  "name": "Hass Input Select",
-  "values": [
-    "Morning",
-    "Day",
-    "Night"
-  ],
+  "accessory": "HassInputBool",
+  "name": "Visitor Mode",
   "mqtt": {
-    "url": "mqtt://192.168.1.2:1883",
-    "clientid": "clinetid",
-    "username": "username",
-    "password": "password",
-    "topic": "publish/topic/in/mqtt"
+    "url":"mqtt://192.168.1.2:1883",
+    "topic":"hass-homebridge/visitor-mode"
   }
 }
 ```
@@ -36,34 +28,39 @@ An example configuration for HomeBridge is below:
 And the following is an example Home Assistant config extract:
 ```yaml
 input_bool:
-  home_state:
-    name: Current Home State
-    options:
-      - Morning
-      - Day
-      - Night
+  visitor_mode:
+    name: "Visitor Mode"
 
 automation:
-  - alias: Home Select Mqtt Publish
+  - alias: Visitor Mode Mqtt Publish
     trigger:
         platform: state
-        entity_id: input_bool.home_state
+        entity_id: input_boolean.visitor_mode
     action:
         - service: mqtt.publish
           data_template:
-              topic: "hass-homebridge/home-state"
-              payload: '{{ states.input_bool.home_state.state }}'
+              topic: "hass-homebridge/visitor-mode"
+              payload: '{{ states.input_boolean.visitor_mode.state }}'
 
-  - alias: Home Select Mqtt Subscribe
+  - alias: Visitor Mode On Mqtt Subscribe
     trigger:
         platform: mqtt
-        topic: "hass-homebridge/home-state"
+        topic: "hass-homebridge/visitor-mode"
+        payload: "on"
     action:
-        - service: input_bool.select_option
+        - service: input_boolean.turn_on
           target:
-              entity_id: input_bool.home_state
-          data:
-              option: "{{ trigger.payload }}
+              entity_id: input_boolean.visitor_mode
+
+  - alias: Visitor Mode Off Mqtt Subscribe
+    trigger:
+        platform: mqtt
+        topic: "hass-homebridge/visitor-mode"
+        payload: "off"
+    action:
+        - service: input_boolean.turn_off
+          target:
+              entity_id: input_boolean.visitor_mode
 ```
 
 # Release Notes
