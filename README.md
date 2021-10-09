@@ -9,7 +9,7 @@ A simple package to bridge mqtt input_bool's from Home Assistant to Homekit usin
 Follow the instructions in [homebridge](https://www.npmjs.com/package/homebridge) for the homebridge server installation.
 This plugin is published through [NPM](https://www.npmjs.com/package/homebridge-hassio-input_bool) and should be installed "globally" by typing:
 
-    npm install -g homebridge-tasmota-sonoff-thermostat
+    npm install -g homebridge-hassio-input_bool
 
 # Configuration
 An example configuration for HomeBridge is below:
