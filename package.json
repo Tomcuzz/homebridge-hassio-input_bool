@@ -1,20 +1,20 @@
 {
-  "name": "homebridge-hassio-input_select",
-  "version": "0.0.30",
-  "description": "A simple package to bridge input_select's from Home Assistant to Homekit using HomeBridge",
+  "name": "homebridge-hassio-input_bool",
+  "version": "0.0.1",
+  "description": "A simple package to bridge input_bool's from Home Assistant to Homekit using HomeBridge",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Tomcuzz/homebridge-hassio-input_select.git"
+    "url": "git+https://github.com/Tomcuzz/homebridge-hassio-input_bool.git"
   },
   "keywords": [
     "homebridge-plugin",
     "Home Assistant",
     "hassio",
-    "input_select"
+    "input_bool"
   ],
   "author": "Thomas Cousin",
   "license": "MIT",
@@ -23,9 +23,9 @@
     "homebridge": ">=0.2.0"
   },
   "bugs": {
-    "url": "https://github.com/Tomcuzz/homebridge-hassio-input_select/issues"
+    "url": "https://github.com/Tomcuzz/homebridge-hassio-input_bool/issues"
   },
-  "homepage": "https://github.com/Tomcuzz/homebridge-hassio-input_select#readme",
+  "homepage": "https://github.com/Tomcuzz/homebridge-hassio-input_bool#readme",
   "dependencies": {
     "mqtt": "^2.9.0"
   }
