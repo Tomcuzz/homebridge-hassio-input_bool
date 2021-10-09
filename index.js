@@ -131,6 +131,7 @@ class HassInputBool{
 				this.updateSwitch();
 			} else {
 				this.log("MQTT Message error, Topic: " + topic + " message: " + message + ", Un-regognised value")
+			}
 		} else {
 			this.log('MQTT Message error topic: ' + topic + ' message: ' + message);
 		}

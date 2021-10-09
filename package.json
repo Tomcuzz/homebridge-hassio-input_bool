@@ -1,6 +1,6 @@
 {
   "name": "homebridge-hassio-input_bool",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A simple package to bridge input_bool's from Home Assistant to Homekit using HomeBridge",
   "main": "index.js",
   "scripts": {
