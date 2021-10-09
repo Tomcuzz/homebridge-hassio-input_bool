@@ -3,25 +3,26 @@ var mqtt = require('mqtt');
 let Service, Characteristic;
 
 module.exports = (api) => {
-  api.registerAccessory('HassInputSelect', HassInputSelect);
+  api.registerAccessory('HassInputBool', HassInputBool);
 };
 
-class HassInputSelect{
+class HassInputBool{
 	constructor(log, config, api) {
 		this.log = log;
 		this.config = config;
 		this.api = api;
 
-		this.name = config.name || 'hass-input-select';
+		this.name = config.name || 'hass-input-bool';
 		this.current_value = "";
-		this.values = config.values || ["No Values"];
+		this.on_value = config.on_value || "ON";
+		this.off_value = config.off_value || "OFF";
 
 		this.mqtt_url = config.mqtt.url || '';
 		this.mqtt_clientid = config.mqtt.clientid || this.createClientId();
-		this.mqtt_username = config.mqtt.username || 'hass-input-select';
+		this.mqtt_username = config.mqtt.username || 'hass-input-bool';
 		this.mqtt_password = config.mqtt.password || 'password';
-		this.mqtt_topic = config.mqtt.topic || 'hass-input-select';
-		this.mqtt_will_topic = config.mqtt.will || 'hass-input-select-will';
+		this.mqtt_topic = config.mqtt.topic || 'hass-input-bool';
+		this.mqtt_will_topic = config.mqtt.will || 'hass-input-bool-will';
 		this.mqtt_options = {
 			keepalive: 10,
 			clientId: this.mqtt_clientId,
@@ -46,61 +47,54 @@ class HassInputSelect{
 	}
 
 	getServices() {
-		this.toReturn = []
-		for (let key in this.Switches) {
-			this.toReturn.push(this.Switches[key])
-		}
-		return this.toReturn;
+		return [this.Switch];
 	}
 
 	setupHapServices() {
 		this.Service = this.api.hap.Service;
       		this.Characteristic = this.api.hap.Characteristic;
-		this.Switches = {};
-		this.values.forEach(element => this.addSwitch(element));
+		this.addSwitch(this.name);
 	}
 
 	addSwitch(name) {
 		this.log("Adding switch " + name);
-		this.Switches[name] = new this.Service.Switch(name, name);
-		this.Switches[name]
+		this.Switch = new this.Service.Switch(name, name);
+		this.Switch
 			.getCharacteristic(this.Characteristic.On)
-			.onGet(this.handleOnGet.bind(this, name))
-			.onSet(this.handleOnSet.bind(this, name));
+			.onGet(this.handleOnGet.bind(this))
+			.onSet(this.handleOnSet.bind(this));
 	}
 
-	handleOnGet(name) {
-		if (name == this.current_value) {
+	handleOnGet() {
+		if (this.on_value == this.current_value) {
 			return 1;
 		} else {
 			return 0;
 		}
 	}
 
-	handleOnSet(name, value) {
-		this.log(name + " Was set to " + value);
+	handleOnSet(value) {
+		this.log(this.name + " Was set to " + value);
 		if (value) {
-			this.mqtt_client.publish(this.mqtt_topic, name);
-                	this.current_value = name;
+			this.mqtt_client.publish(this.mqtt_topic, this.on_value);
+			this.current_value = this.on_value;
 		} else {
-			this.log('Tried to set scene to off');
+			this.mqtt_client.publish(this.mqtt_topic, this.off_value);
+			this.current_value = this.off_value;
 		}
-		this.updateSwitches(name)
+		this.updateSwitch()
 	}
 
-	updateSwitches(name) {
-		for (let key in this.Switches) {
-			if (key == this.current_value) {
-				
-				this.Switches[key].getCharacteristic(this.Characteristic.On).updateValue(true);
-			} else {
-				this.Switches[key].getCharacteristic(this.Characteristic.On).updateValue(false);
-			}
+	updateSwitch() {
+		if (this.current_value == this.on_value) {
+			this.Switch.getCharacteristic(this.Characteristic.On).updateValue(true);
+		} else {
+			this.Switch.getCharacteristic(this.Characteristic.On).updateValue(false);
 		}
 	}
 
 	createClientId() {
-		return 'hass-input-select' +
+		return 'hass-input-bool' +
 			this.name.replace(/[^\x20-\x7F]/g, "") + '_' +
 			Math.random().toString(16).substr(2, 8);
 	}
@@ -132,8 +126,11 @@ class HassInputSelect{
 	handleMqttMessage(topic, message) {
 		this.log("MQTT receieved, Topic: " + topic + " message: " + message);
 		if (topic == this.mqtt_topic) {
-			this.current_value = message;
-			this.updateSwitches(message)
+			if (message == this.on_value || message == this.off_value) {
+				this.current_value = message;
+				this.updateSwitch();
+			} else {
+				this.log("MQTT Message error, Topic: " + topic + " message: " + message + ", Un-regognised value")
 		} else {
 			this.log('MQTT Message error topic: ' + topic + ' message: ' + message);
 		}
